@@ -21,7 +21,7 @@
       <strong>Číslo účtu:</strong> <span id="acc-text">3802085003/5500</span><br>
       <strong>Částka:</strong> <span id="amount-text">--</span> Kč<br>
       <strong>Variabilní symbol:</strong> <span id="vs-text">--</span><br>
-      <strong>Zpráva pro příjemce:</strong> Vstupenky
+      <strong>Zpráva pro příjemce:</strong> <span id="msg-text">Vstupenky ples</span>
     </div>
     <img id="qr-img" alt="Načítání QR kódu..." />
     <p class="note">Po připsání platby na účet vám na e-mail dorazí potvrzení.</p>
@@ -33,11 +33,20 @@
     const vs = params.get('vs') || '';
     const acc = params.get('acc') || '3802085003';
     const bank = params.get('bank') || '5500';
+    const name = params.get('name') || '';
+
+    // Supports either ?msg=Vstupenky+ples+Jmeno (from Apps Script) or ?name=Jmeno directly
+    const rawMsg = params.get('msg') || (name ? `Vstupenky ples ${name}` : 'Vstupenky ples');
+    const safeQrMsg = rawMsg
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .slice(0, 60);
 
     document.getElementById('acc-text').textContent = `${acc}/${bank}`;
     document.getElementById('amount-text').textContent = amount;
     document.getElementById('vs-text').textContent = vs;
-    document.getElementById('qr-img').src = `https://api.paylibo.com/paylibo/generator/czech/image?accountNumber=${encodeURIComponent(acc)}&bankCode=${encodeURIComponent(bank)}&amount=${encodeURIComponent(amount)}&currency=CZK&vs=${encodeURIComponent(vs)}&message=Vstupenky&size=400`;
+    document.getElementById('msg-text').textContent = rawMsg;
+    document.getElementById('qr-img').src = `https://api.paylibo.com/paylibo/generator/czech/image?accountNumber=${encodeURIComponent(acc)}&bankCode=${encodeURIComponent(bank)}&amount=${encodeURIComponent(amount)}&currency=CZK&vs=${encodeURIComponent(vs)}&message=${encodeURIComponent(safeQrMsg)}&size=400`;
   </script>
 </body>
 </html>
