@@ -27,15 +27,26 @@
     <p class="note">Po připsání platby na účet vám na e-mail dorazí potvrzení.</p>
   </div>
 
-  <script>
+<script>
+    // Stejná funkce jako v Google Scriptu: převede Tally Respondent ID na unikátní 6místné číslo
+    function ridToDigits(rid) {
+      let hash = 0;
+      for (let i = 0; i < rid.length; i++) {
+        hash = (hash * 31 + rid.charCodeAt(i)) % 1000000;
+      }
+      return String(hash).padStart(6, '0');
+    }
+
     const params = new URLSearchParams(window.location.search);
     const amount = params.get('amount') || '0';
-    const vs = params.get('vs') || '';
+    const rid = (params.get('rid') || '').trim();
     const acc = params.get('acc') || '3802085003';
     const bank = params.get('bank') || '5500';
     const name = params.get('name') || '';
 
-    // Supports either ?msg=Vstupenky+ples+Jmeno (from Apps Script) or ?name=Jmeno directly
+    // Pokud je v URL ?rid=..., vygeneruje unikátní 10místný VS (2601 + 6 číslic z rid)
+    const vs = params.get('vs') || (rid ? ('2601' + ridToDigits(rid)) : (params.get('phone') || ''));
+
     const rawMsg = params.get('msg') || (name ? `Vstupenky ples ${name}` : 'Vstupenky ples');
     const safeQrMsg = rawMsg
       .normalize('NFD')
