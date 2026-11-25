@@ -8,19 +8,20 @@
   <style>
     :root {
       color-scheme: light;
-      --forest-950: #0b2d22;
-      --forest-900: #113e2f;
-      --forest-800: #185440;
+      --pine-950: #082419;
+      --pine-900: #134632;
+      --pine-800: #1b5e43;
+      --pine-700: #226b4d;
+      --moss-200: #c7ddd0;
+      --moss-100: #e7efe9;
+      --moss-50: #f2f7f3;
       --gold-500: #c8963e;
-      --gold-200: #f3e4c3;
-      --gold-100: #fbf6eb;
-      --bg: #f4f1ea;
+      --gold-200: #f0dfb8;
       --surface: #ffffff;
-      --surface-soft: #f8f7f3;
-      --ink-900: #141c18;
-      --ink-700: #3d4a44;
-      --ink-500: #66756e;
-      --border: #e5e1d8;
+      --ink-900: #0f241b;
+      --ink-700: #334e42;
+      --ink-500: #5a7468;
+      --border: #d5e3d9;
       --ok: #15803d;
       --ok-bg: #ecfdf5;
       --err: #b91c1c;
@@ -36,9 +37,10 @@
       font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
       color: var(--ink-900);
       background:
-        radial-gradient(circle at 15% 10%, rgba(200, 150, 62, 0.14), transparent 42%),
-        radial-gradient(circle at 85% 90%, rgba(17, 62, 47, 0.10), transparent 45%),
-        var(--bg);
+        radial-gradient(circle at 12% 8%, rgba(27, 94, 67, 0.16), transparent 45%),
+        radial-gradient(circle at 88% 15%, rgba(200, 150, 62, 0.12), transparent 40%),
+        radial-gradient(circle at 50% 100%, rgba(19, 70, 50, 0.16), transparent 55%),
+        var(--moss-100);
       display: flex;
       justify-content: center;
       align-items: flex-start;
@@ -50,32 +52,42 @@
       margin: auto;
       background: var(--surface);
       border-radius: 20px;
-      border: 1px solid rgba(200, 150, 62, 0.25);
+      border: 1px solid var(--moss-200);
       box-shadow:
-        0 18px 45px rgba(11, 45, 34, 0.10),
-        0 2px 8px rgba(11, 45, 34, 0.05);
+        0 20px 48px rgba(8, 36, 25, 0.14),
+        0 3px 10px rgba(8, 36, 25, 0.06);
       overflow: hidden;
     }
 
     .hero {
       position: relative;
-      padding: 28px 24px 24px;
+      padding: 28px 24px 46px;
       text-align: center;
       color: #fff;
       background:
-        radial-gradient(circle at 80% 0%, rgba(200, 150, 62, 0.28), transparent 55%),
-        linear-gradient(155deg, var(--forest-950) 0%, var(--forest-800) 100%);
-      border-bottom: 3px solid var(--gold-500);
+        radial-gradient(circle at 20% 18%, rgba(240, 223, 184, 0.18), transparent 36%),
+        radial-gradient(circle at 82% 14%, rgba(200, 150, 62, 0.22), transparent 42%),
+        linear-gradient(165deg, var(--pine-950) 0%, var(--pine-900) 56%, var(--pine-800) 100%);
+    }
+
+    .hero-trees {
+      position: absolute;
+      inset-inline: 0;
+      inset-block-end: -1px;
+      width: 100%;
+      height: 36px;
+      display: block;
+      pointer-events: none;
     }
 
     .badge {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 5px 12px;
+      padding: 5px 13px;
       border-radius: 999px;
-      background: rgba(255, 255, 255, 0.12);
-      border: 1px solid rgba(243, 228, 195, 0.35);
+      background: rgba(255, 255, 255, 0.11);
+      border: 1px solid rgba(240, 223, 184, 0.35);
       color: var(--gold-200);
       font-size: 0.78rem;
       font-weight: 600;
@@ -98,11 +110,11 @@
       margin: 0;
       font-size: 0.94rem;
       line-height: 1.5;
-      color: rgba(255, 255, 255, 0.86);
+      color: rgba(235, 246, 239, 0.9);
       text-wrap: pretty;
     }
 
-    .content { padding: 22px 22px 26px; }
+    .content { padding: 20px 22px 26px; }
 
     .amount-banner {
       display: flex;
@@ -112,20 +124,20 @@
       padding: 14px 18px;
       margin-bottom: 18px;
       border-radius: 14px;
-      background: var(--gold-100);
-      border: 1px solid var(--gold-200);
+      background: linear-gradient(135deg, var(--moss-50) 0%, #eaf3ec 100%);
+      border: 1px solid var(--moss-200);
     }
 
     .amount-label {
       font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--forest-900);
+      font-weight: 650;
+      color: var(--pine-900);
     }
 
     .amount-value {
       font-size: 1.55rem;
       font-weight: 800;
-      color: var(--forest-950);
+      color: var(--pine-950);
       font-variant-numeric: tabular-nums;
       letter-spacing: -0.02em;
     }
@@ -135,7 +147,7 @@
       padding: 18px 16px 14px;
       margin-bottom: 18px;
       border-radius: 16px;
-      background: var(--surface-soft);
+      background: var(--moss-50);
       border: 1px solid var(--border);
     }
 
@@ -145,7 +157,7 @@
       background: #fff;
       border-radius: 14px;
       border: 1px solid var(--border);
-      box-shadow: 0 4px 14px rgba(11, 45, 34, 0.06);
+      box-shadow: 0 4px 14px rgba(8, 36, 25, 0.07);
     }
 
     #qr-img {
@@ -221,10 +233,10 @@
       min-inline-size: 36px;
       min-block-size: 34px;
       padding: 6px 11px;
-      border: 1px solid var(--border);
+      border: 1px solid var(--moss-200);
       border-radius: 9px;
-      background: var(--surface-soft);
-      color: var(--forest-900);
+      background: var(--moss-50);
+      color: var(--pine-900);
       font-size: 0.8rem;
       font-weight: 600;
       cursor: pointer;
@@ -232,12 +244,12 @@
     }
 
     .copy-button:hover {
-      background: var(--gold-100);
-      border-color: var(--gold-500);
+      background: var(--moss-100);
+      border-color: var(--pine-700);
     }
 
     .copy-button:focus-visible {
-      outline: 2px solid var(--forest-800);
+      outline: 2px solid var(--pine-700);
       outline-offset: 2px;
     }
 
@@ -262,7 +274,7 @@
       inset-inline-end: 0;
       padding: 4px 9px;
       border-radius: 6px;
-      background: var(--forest-950);
+      background: var(--pine-950);
       color: #fff;
       font-size: 0.74rem;
       font-weight: 600;
@@ -280,7 +292,7 @@
       margin: 0;
       padding: 14px 16px;
       border-radius: 14px;
-      background: var(--surface-soft);
+      background: var(--moss-50);
       border: 1px solid var(--border);
       display: grid;
       gap: 10px;
@@ -301,7 +313,7 @@
       width: 22px;
       height: 22px;
       border-radius: 999px;
-      background: var(--forest-900);
+      background: var(--pine-900);
       color: var(--gold-200);
       font-size: 0.74rem;
       font-weight: 700;
@@ -334,15 +346,15 @@
     }
 
     .contact-link {
-      color: var(--forest-900);
+      color: var(--pine-900);
       font-weight: 650;
       text-decoration: underline;
       text-underline-offset: 2px;
       white-space: nowrap;
     }
 
-    .contact-link:hover { color: var(--forest-800); }
-    .contact-link:focus-visible { outline: 2px solid var(--forest-800); outline-offset: 2px; border-radius: 3px; }
+    .contact-link:hover { color: var(--pine-700); }
+    .contact-link:focus-visible { outline: 2px solid var(--pine-700); outline-offset: 2px; border-radius: 3px; }
 
     .sr-only {
       position: absolute;
@@ -363,7 +375,7 @@
     }
 
     @media (max-width: 400px) {
-      .hero { padding: 24px 18px 20px; }
+      .hero { padding: 24px 18px 42px; }
       .content { padding: 18px 16px 22px; }
       .amount-value { font-size: 1.35rem; }
     }
@@ -373,13 +385,19 @@
   <main class="card">
     <header class="hero">
       <div class="badge">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M20 6 9 17l-5-5" />
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="m12 2 5 7h-3l4 6h-4l3 5H7l3-5H6l4-6H7l5-7Z" />
+          <path d="M12 20v2" />
         </svg>
         Skautský ples · Registrace přijata
       </div>
       <h1>Děkujeme za registraci!</h1>
       <p id="greeting-text" class="subtitle">Tvoje objednávka vstupenek je zapsaná. Pro její potvrzení prosím uhraď částku níže.</p>
+
+      <svg class="hero-trees" viewBox="0 0 470 36" preserveAspectRatio="none" aria-hidden="true">
+        <path fill="rgba(8,36,25,0.45)" d="M0 36V24l12-11 10 9 14-14 13 12 11-10 14 14 10-8 16-14 14 13 12-9 15 14 13-12 12 10 15-15 15 14 10-8 14 13 14-14 14 12 12-10 16 15 14-13 13 11 15-14 13 12 11-9 16 14 12-11 14 13 13-12 12 10 15-14 14 13 11-9 15 14 11-10 13 12V36Z"/>
+        <path fill="#ffffff" d="M0 36v-6l11-9 9 7 13-11 11 9 10-7 13 10 12-11 14 11 11-8 13 10 14-12 12 10 11-7 14 11 13-11 13 10 12-9 15 12 13-11 12 9 14-12 14 11 11-8 14 11 12-10 13 10 14-12 13 11 11-8 14 11 13-11 13 10 12-9 14 11 11-9 11 9v6Z"/>
+      </svg>
     </header>
 
     <div class="content">
