@@ -3,61 +3,619 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Platební údaje</title>
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Děkujeme za registraci – Skautský ples</title>
   <style>
-    body { font-family: system-ui, -apple-system, sans-serif; background: #f9fafb; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 16px; box-sizing: border-box; }
-    .card { background: white; padding: 28px; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.08); max-width: 400px; width: 100%; text-align: center; }
-    h2 { margin-top: 0; color: #111827; }
-    .details { background: #f3f4f6; padding: 16px; border-radius: 8px; text-align: left; margin: 16px 0; line-height: 1.8; color: #1f2937; }
-    img { max-width: 260px; width: 100%; height: auto; border: 1px solid #e5e7eb; border-radius: 8px; margin-top: 8px; }
-    .note { font-size: 0.85rem; color: #6b7280; margin-top: 16px; }
+    :root {
+      color-scheme: light;
+      --forest-950: #0b2d22;
+      --forest-900: #113e2f;
+      --forest-800: #185440;
+      --gold-500: #c8963e;
+      --gold-200: #f3e4c3;
+      --gold-100: #fbf6eb;
+      --bg: #f4f1ea;
+      --surface: #ffffff;
+      --surface-soft: #f8f7f3;
+      --ink-900: #141c18;
+      --ink-700: #3d4a44;
+      --ink-500: #66756e;
+      --border: #e5e1d8;
+      --ok: #15803d;
+      --ok-bg: #ecfdf5;
+      --err: #b91c1c;
+      --err-bg: #fef2f2;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100svh;
+      padding: 20px 14px 36px;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      color: var(--ink-900);
+      background:
+        radial-gradient(circle at 15% 10%, rgba(200, 150, 62, 0.14), transparent 42%),
+        radial-gradient(circle at 85% 90%, rgba(17, 62, 47, 0.10), transparent 45%),
+        var(--bg);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 470px;
+      margin: auto;
+      background: var(--surface);
+      border-radius: 20px;
+      border: 1px solid rgba(200, 150, 62, 0.25);
+      box-shadow:
+        0 18px 45px rgba(11, 45, 34, 0.10),
+        0 2px 8px rgba(11, 45, 34, 0.05);
+      overflow: hidden;
+    }
+
+    .hero {
+      position: relative;
+      padding: 28px 24px 24px;
+      text-align: center;
+      color: #fff;
+      background:
+        radial-gradient(circle at 80% 0%, rgba(200, 150, 62, 0.28), transparent 55%),
+        linear-gradient(155deg, var(--forest-950) 0%, var(--forest-800) 100%);
+      border-bottom: 3px solid var(--gold-500);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(243, 228, 195, 0.35);
+      color: var(--gold-200);
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .badge svg { width: 14px; height: 14px; flex: none; }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.45rem, 4.5vw, 1.75rem);
+      font-weight: 750;
+      letter-spacing: -0.02em;
+      text-wrap: balance;
+    }
+
+    .subtitle {
+      margin: 0;
+      font-size: 0.94rem;
+      line-height: 1.5;
+      color: rgba(255, 255, 255, 0.86);
+      text-wrap: pretty;
+    }
+
+    .content { padding: 22px 22px 26px; }
+
+    .amount-banner {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      padding: 14px 18px;
+      margin-bottom: 18px;
+      border-radius: 14px;
+      background: var(--gold-100);
+      border: 1px solid var(--gold-200);
+    }
+
+    .amount-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--forest-900);
+    }
+
+    .amount-value {
+      font-size: 1.55rem;
+      font-weight: 800;
+      color: var(--forest-950);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
+    }
+
+    .qr-section {
+      text-align: center;
+      padding: 18px 16px 14px;
+      margin-bottom: 18px;
+      border-radius: 16px;
+      background: var(--surface-soft);
+      border: 1px solid var(--border);
+    }
+
+    .qr-frame {
+      display: inline-block;
+      padding: 10px;
+      background: #fff;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 14px rgba(11, 45, 34, 0.06);
+    }
+
+    #qr-img {
+      display: block;
+      width: 220px;
+      max-width: 100%;
+      height: auto;
+      border-radius: 6px;
+    }
+
+    .qr-caption {
+      margin: 10px 0 0;
+      font-size: 0.82rem;
+      color: var(--ink-500);
+      text-wrap: pretty;
+    }
+
+    .section-title {
+      margin: 0 0 10px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--ink-500);
+    }
+
+    .details {
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      overflow: hidden;
+      margin-bottom: 18px;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .row:last-child { border-bottom: none; }
+
+    .row-info { min-width: 0; overflow-wrap: anywhere; }
+
+    .label {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--ink-500);
+      margin-bottom: 2px;
+    }
+
+    .val {
+      font-size: 0.96rem;
+      font-weight: 650;
+      color: var(--ink-900);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .val-mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.94rem;
+    }
+
+    .copy { position: relative; flex: none; display: inline-flex; align-items: center; }
+
+    .copy-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      min-inline-size: 36px;
+      min-block-size: 34px;
+      padding: 6px 11px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: var(--surface-soft);
+      color: var(--forest-900);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    }
+
+    .copy-button:hover {
+      background: var(--gold-100);
+      border-color: var(--gold-500);
+    }
+
+    .copy-button:focus-visible {
+      outline: 2px solid var(--forest-800);
+      outline-offset: 2px;
+    }
+
+    .copy-button svg { width: 14px; height: 14px; flex: none; }
+    .copy-button .icon-check { display: none; }
+    .copy-button[data-copied] {
+      background: var(--ok-bg);
+      border-color: var(--ok);
+      color: var(--ok);
+    }
+    .copy-button[data-copied] .icon-copy { display: none; }
+    .copy-button[data-copied] .icon-check { display: inline; }
+    .copy-button[data-failed] {
+      background: var(--err-bg);
+      border-color: var(--err);
+      color: var(--err);
+    }
+
+    .tip {
+      position: absolute;
+      inset-block-end: calc(100% + 6px);
+      inset-inline-end: 0;
+      padding: 4px 9px;
+      border-radius: 6px;
+      background: var(--forest-950);
+      color: #fff;
+      font-size: 0.74rem;
+      font-weight: 600;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+    }
+
+    .copy-button[data-copied] + .tip,
+    .copy-button[data-failed] + .tip { opacity: 1; }
+
+    .steps {
+      list-style: none;
+      margin: 0;
+      padding: 14px 16px;
+      border-radius: 14px;
+      background: var(--surface-soft);
+      border: 1px solid var(--border);
+      display: grid;
+      gap: 10px;
+    }
+
+    .steps li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 0.84rem;
+      line-height: 1.45;
+      color: var(--ink-700);
+      text-wrap: pretty;
+    }
+
+    .step-num {
+      flex: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      background: var(--forest-900);
+      color: var(--gold-200);
+      font-size: 0.74rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1px;
+    }
+
+    .alert {
+      background: var(--err-bg);
+      border: 1px solid #fecaca;
+      color: var(--err);
+      padding: 14px 16px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      text-align: left;
+      margin: 0 0 16px;
+      text-wrap: pretty;
+    }
+
+    .footer-note {
+      margin: 16px 0 0;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--ink-500);
+      text-wrap: pretty;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    [hidden] { display: none !important; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .copy-button, .tip { transition: opacity 0.01s; }
+    }
+
+    @media (max-width: 400px) {
+      .hero { padding: 24px 18px 20px; }
+      .content { padding: 18px 16px 22px; }
+      .amount-value { font-size: 1.35rem; }
+    }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h2>Děkujeme za registraci!</h2>
-    <p>Vstupenky uhradíte naskenováním QR kódu ve vaší bankovní aplikaci nebo převodem:</p>
-    <div class="details">
-      <strong>Číslo účtu:</strong> <span id="acc-text">3802085003/5500</span><br>
-      <strong>Částka:</strong> <span id="amount-text">--</span> Kč<br>
-      <strong>Variabilní symbol:</strong> <span id="vs-text">--</span><br>
-      <strong>Zpráva pro příjemce:</strong> <span id="msg-text">Vstupenky ples</span>
-    </div>
-    <img id="qr-img" alt="Načítání QR kódu..." />
-    <p class="note">Po připsání platby na účet vám na e-mail dorazí potvrzení.</p>
-  </div>
+  <main class="card">
+    <header class="hero">
+      <div class="badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M20 6 9 17l-5-5" />
+        </svg>
+        Skautský ples · Registrace přijata
+      </div>
+      <h1>Děkujeme za registraci!</h1>
+      <p id="greeting-text" class="subtitle">Tvoje objednávka vstupenek je zapsaná. Pro její potvrzení prosím uhraď částku níže.</p>
+    </header>
 
-<script>
-    // Stejná funkce jako v Google Scriptu: převede Tally Respondent ID na unikátní 6místné číslo
-    function ridToDigits(rid) {
-      let hash = 0;
-      for (let i = 0; i < rid.length; i++) {
-        hash = (hash * 31 + rid.charCodeAt(i)) % 1000000;
+    <div class="content">
+      <div id="error-box" class="alert" role="alert" hidden></div>
+
+      <div id="payment-box">
+        <div class="amount-banner">
+          <span class="amount-label">Částka k úhradě</span>
+          <span class="amount-value"><span id="amount-hero">--</span> Kč</span>
+        </div>
+
+        <section class="qr-section" aria-label="QR platba">
+          <div id="qr-frame" class="qr-frame">
+            <img id="qr-img" width="220" height="220" alt="QR kód pro platbu vstupenek" referrerpolicy="no-referrer" />
+          </div>
+          <p id="qr-caption" class="qr-caption">Naskenujte QR kód v bankovní aplikaci (SPAYD)</p>
+          <p id="qr-fallback" class="alert" hidden>QR kód se nepodařilo načíst. Použijte prosím tlačítka Kopírovat níže pro ruční převod v bankovní aplikaci.</p>
+        </section>
+
+        <h2 class="section-title">Údaje pro bankovní převod</h2>
+        <div class="details">
+          <div class="row">
+            <div class="row-info">
+              <span class="label">Číslo účtu (Fio banka)</span>
+              <span id="acc-text" class="val val-mono">2303663003/2010</span>
+            </div>
+            <span class="copy">
+              <button type="button" class="copy-button" command="--copy" commandfor="acc-text">
+                <svg class="icon-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                <svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                Kopírovat<span class="sr-only"> číslo účtu</span>
+              </button>
+              <span class="tip" role="status"></span>
+            </span>
+          </div>
+
+          <div class="row">
+            <div class="row-info">
+              <span class="label">Částka</span>
+              <span class="val val-mono"><span id="amount-text">--</span> Kč</span>
+            </div>
+            <span class="copy">
+              <button type="button" class="copy-button" command="--copy" commandfor="amount-text">
+                <svg class="icon-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                <svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                Kopírovat<span class="sr-only"> částku</span>
+              </button>
+              <span class="tip" role="status"></span>
+            </span>
+          </div>
+
+          <div class="row">
+            <div class="row-info">
+              <span class="label">Variabilní symbol</span>
+              <span id="vs-text" class="val val-mono">--</span>
+            </div>
+            <span class="copy">
+              <button type="button" class="copy-button" command="--copy" commandfor="vs-text">
+                <svg class="icon-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                <svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                Kopírovat<span class="sr-only"> variabilní symbol</span>
+              </button>
+              <span class="tip" role="status"></span>
+            </span>
+          </div>
+
+          <div class="row">
+            <div class="row-info">
+              <span class="label">Zpráva pro příjemce</span>
+              <span id="msg-text" class="val">Vstupenky ples</span>
+            </div>
+            <span class="copy">
+              <button type="button" class="copy-button" command="--copy" commandfor="msg-text">
+                <svg class="icon-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                <svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                Kopírovat<span class="sr-only"> zprávu pro příjemce</span>
+              </button>
+              <span class="tip" role="status"></span>
+            </span>
+          </div>
+        </div>
+
+        <ol class="steps" aria-label="Co se děje dál">
+          <li><span class="step-num" aria-hidden="true">1</span><span>Platební údaje jsme ti poslali také na e-mail (zkontroluj případně i složku Hromadné / Spam).</span></li>
+          <li><span class="step-num" aria-hidden="true">2</span><span>Jakmile platba dorazí na účet Fio banky, systém ji automaticky spáruje podle variabilního symbolu.</span></li>
+          <li><span class="step-num" aria-hidden="true">3</span><span>Během několika minut po připsání ti pošleme potvrzovací e-mail o platných vstupenkách.</span></li>
+        </ol>
+      </div>
+
+      <p class="footer-note">Těšíme se na tebe na Skautském plese!</p>
+    </div>
+  </main>
+
+  <script>
+    // Pevně zakódovaný účet pořadatele (ochrana proti podvržení účtu v URL parametrech)
+    const OFFICIAL_ACCOUNT = '2303663003';
+    const OFFICIAL_BANK = '2010';
+    const VS_PREFIX = '26';
+
+    // Shodný deterministický hash s Google Apps Scriptem (FNV-1a 32-bit -> 10místný VS)
+    function generateVS(id) {
+      const str = String(id || '').trim();
+      if (!str) return '';
+      let h = 2166136261;
+      for (let i = 0; i < str.length; i++) {
+        h ^= str.charCodeAt(i);
+        h = Math.imul(h, 16777619);
       }
-      return String(hash).padStart(6, '0');
+      const num = (h >>> 0) % 100000000;
+      return VS_PREFIX + String(num).padStart(8, '0');
+    }
+
+    function parseAmount(raw) {
+      const cleaned = String(raw || '')
+        .replace(/[\s\u00A0\u202F]/g, '')
+        .replace(/Kč|CZK/gi, '')
+        .replace(',', '.');
+      if (!cleaned) return NaN;
+      const num = Number(cleaned);
+      return Number.isFinite(num) ? num : NaN;
+    }
+
+    function formatAmount(num) {
+      return Number.isInteger(num) ? String(num) : num.toFixed(2);
+    }
+
+    function sanitizeQrMessage(msg) {
+      const map = { 'ł': 'l', 'Ł': 'L', 'đ': 'd', 'Đ': 'D', 'ß': 'ss' };
+      return String(msg || '')
+        .replace(/[łŁđĐß]/g, (ch) => map[ch] || ch)
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[*\r\n\t]+/g, ' ')
+        .replace(/[^\x20-\x7E]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .slice(0, 60);
+    }
+
+    function sanitizeVs(raw) {
+      const digits = String(raw || '').replace(/\D+/g, '');
+      return digits.length > 0 && digits.length <= 10 ? digits : '';
     }
 
     const params = new URLSearchParams(window.location.search);
-    const amount = params.get('amount') || '0';
+    const amountNum = parseAmount(params.get('amount'));
+    const explicitVs = sanitizeVs(params.get('vs'));
+    const sid = (params.get('sid') || '').trim();
     const rid = (params.get('rid') || '').trim();
-    const acc = params.get('acc') || '3802085003';
-    const bank = params.get('bank') || '5500';
-    const name = params.get('name') || '';
+    const name = (params.get('name') || '').trim();
 
-    // Pokud je v URL ?rid=..., vygeneruje unikátní 10místný VS (2601 + 6 číslic z rid)
-    const vs = params.get('vs') || (rid ? ('2601' + ridToDigits(rid)) : (params.get('phone') || ''));
+    if (name) {
+      document.getElementById('greeting-text').textContent = `Ahoj ${name}, tvoje objednávka vstupenek je zapsaná. Pro její potvrzení prosím uhraď částku níže.`;
+    }
 
-    const rawMsg = params.get('msg') || (name ? `Vstupenky ples ${name}` : 'Vstupenky ples');
-    const safeQrMsg = rawMsg
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .slice(0, 60);
+    const vs = explicitVs || (sid ? generateVS(sid) : (rid ? generateVS(rid) : ''));
+    const rawMsg = (params.get('msg') || (name ? `Vstupenky ples ${name}` : 'Vstupenky ples')).trim();
+    const safeQrMsg = sanitizeQrMessage(rawMsg) || 'Vstupenky ples';
 
-    document.getElementById('acc-text').textContent = `${acc}/${bank}`;
-    document.getElementById('amount-text').textContent = amount;
-    document.getElementById('vs-text').textContent = vs;
-    document.getElementById('msg-text').textContent = rawMsg;
-    document.getElementById('qr-img').src = `https://api.paylibo.com/paylibo/generator/czech/image?accountNumber=${encodeURIComponent(acc)}&bankCode=${encodeURIComponent(bank)}&amount=${encodeURIComponent(amount)}&currency=CZK&vs=${encodeURIComponent(vs)}&message=${encodeURIComponent(safeQrMsg)}&size=400`;
+    const errorBox = document.getElementById('error-box');
+    const paymentBox = document.getElementById('payment-box');
+
+    if (!(amountNum > 0 && amountNum <= 100000) || !vs) {
+      paymentBox.hidden = true;
+      errorBox.hidden = false;
+      errorBox.textContent = 'Chybí nebo jsou neplatné platební údaje v odkazu. Zkontrolujte prosím platební údaje v potvrzovacím e-mailu nebo kontaktujte pořadatele.';
+    } else {
+      const amountStr = formatAmount(amountNum);
+      document.getElementById('acc-text').textContent = `${OFFICIAL_ACCOUNT}/${OFFICIAL_BANK}`;
+      document.getElementById('amount-hero').textContent = amountStr;
+      document.getElementById('amount-text').textContent = amountStr;
+      document.getElementById('vs-text').textContent = vs;
+      document.getElementById('msg-text').textContent = safeQrMsg;
+
+      const qrImg = document.getElementById('qr-img');
+      const qrFrame = document.getElementById('qr-frame');
+      const qrCaption = document.getElementById('qr-caption');
+      const qrFallback = document.getElementById('qr-fallback');
+      qrImg.addEventListener('error', () => {
+        qrFrame.hidden = true;
+        qrCaption.hidden = true;
+        qrFallback.hidden = false;
+      });
+      qrImg.src = `https://api.paylibo.com/paylibo/generator/czech/image?accountNumber=${OFFICIAL_ACCOUNT}&bankCode=${OFFICIAL_BANK}&amount=${encodeURIComponent(amountStr)}&currency=CZK&vs=${encodeURIComponent(vs)}&message=${encodeURIComponent(safeQrMsg)}&size=400`;
+    }
+
+    // Accessible copy buttons (Invoker Commands + click fallback + legacy clipboard fallback)
+    const timers = new WeakMap();
+    let lastMessage = '';
+
+    function legacyCopy(text) {
+      const previousFocus = document.activeElement;
+      const field = Object.assign(document.createElement('textarea'), { value: text });
+      field.setAttribute('readonly', '');
+      field.style.cssText = 'position:fixed;inset-block-start:0;opacity:0';
+      document.body.append(field);
+      field.select();
+      try {
+        return document.execCommand('copy');
+      } finally {
+        field.remove();
+        previousFocus?.focus({ preventScroll: true });
+      }
+    }
+
+    function report(button, ok) {
+      const tip = button.nextElementSibling;
+      clearTimeout(timers.get(button));
+      button.removeAttribute('data-copied');
+      button.removeAttribute('data-failed');
+      let message = ok ? 'Zkopírováno' : 'Kopírování selhalo';
+      if (message === lastMessage) message += '\u00A0';
+      lastMessage = message;
+      tip.textContent = '';
+      void button.offsetWidth;
+      button.setAttribute(ok ? 'data-copied' : 'data-failed', '');
+      requestAnimationFrame(() => { tip.textContent = message; });
+      timers.set(button, setTimeout(() => {
+        button.removeAttribute('data-copied');
+        button.removeAttribute('data-failed');
+        tip.textContent = '';
+      }, 2000));
+    }
+
+    async function copy(button, target) {
+      const text = target.innerText.trim();
+      if (!text) return;
+      try {
+        await navigator.clipboard.writeText(text);
+        report(button, true);
+      } catch {
+        report(button, legacyCopy(text));
+      }
+    }
+
+    if ('CommandEvent' in window) {
+      document.addEventListener('command', (event) => {
+        if (event.command === '--copy') copy(event.source, event.target);
+      }, true);
+    } else {
+      document.addEventListener('click', (event) => {
+        if (event.defaultPrevented) return;
+        const button = event.target.closest('button[command="--copy"]');
+        if (!button) return;
+        const target = document.getElementById(button.getAttribute('commandfor'));
+        if (target) copy(button, target);
+      });
+    }
   </script>
 </body>
 </html>

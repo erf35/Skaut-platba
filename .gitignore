@@ -1,0 +1,5 @@
+# Local-only Apps Script & workspace files (repo is public GitHub Pages)
+gas/
+MEMORY.md
+.clasp.json
+node_modules/
