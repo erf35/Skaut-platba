@@ -172,8 +172,71 @@
       margin: 10px 0 0;
       font-size: 0.82rem;
       color: var(--ink-500);
+      line-height: 1.45;
       text-wrap: pretty;
     }
+
+    .qr-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .qr-btn {
+      flex: 1 1 150px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      min-block-size: 42px;
+      padding: 9px 14px;
+      border-radius: 10px;
+      font-size: 0.86rem;
+      font-weight: 650;
+      cursor: pointer;
+      transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    }
+
+    .qr-btn svg { width: 16px; height: 16px; flex: none; }
+
+    .qr-btn-primary {
+      border: 1px solid var(--pine-900);
+      background: var(--pine-900);
+      color: #fff;
+    }
+
+    .qr-btn-primary:hover {
+      background: var(--pine-800);
+      border-color: var(--pine-800);
+    }
+
+    .qr-btn-secondary {
+      border: 1px solid var(--moss-200);
+      background: #fff;
+      color: var(--pine-900);
+    }
+
+    .qr-btn-secondary:hover {
+      background: var(--moss-100);
+      border-color: var(--pine-700);
+    }
+
+    .qr-btn:focus-visible {
+      outline: 2px solid var(--pine-700);
+      outline-offset: 2px;
+    }
+
+    .qr-status {
+      margin: 8px 0 0;
+      min-height: 1.1em;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--ok);
+    }
+
+    .qr-status[data-error] { color: var(--err); }
 
     .section-title {
       margin: 0 0 10px;
@@ -413,8 +476,19 @@
           <div id="qr-frame" class="qr-frame">
             <img id="qr-img" width="220" height="220" alt="QR kód pro platbu vstupenek" referrerpolicy="no-referrer" />
           </div>
-          <p id="qr-caption" class="qr-caption">Naskenujte QR kód v bankovní aplikaci (SPAYD)</p>
-          <p id="qr-fallback" class="alert" hidden>QR kód se nepodařilo načíst. Použijte prosím tlačítka Kopírovat níže pro ruční převod v bankovní aplikaci.</p>
+          <p id="qr-caption" class="qr-caption">Naskenuj v bankovní aplikaci, nebo QR rovnou sdílej / ulož do telefonu.</p>
+          <div id="qr-actions" class="qr-actions" hidden>
+            <button type="button" id="share-qr-btn" class="qr-btn qr-btn-primary" hidden>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.59 13.51 6.83 3.98M15.41 6.51l-6.82 3.98"/></svg>
+              Sdílet QR do banky
+            </button>
+            <button type="button" id="download-qr-btn" class="qr-btn qr-btn-secondary">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Uložit QR kód
+            </button>
+          </div>
+          <p id="qr-status" class="qr-status" role="status"></p>
+          <p id="qr-fallback" class="alert" hidden>QR kód se nepodařilo vygenerovat. Použijte prosím tlačítka Kopírovat níže pro ruční převod v bankovní aplikaci.</p>
         </section>
 
         <h2 class="section-title">Údaje pro bankovní převod</h2>
@@ -493,10 +567,12 @@
     </div>
   </main>
 
+  <script src="./qrcode.js"></script>
   <script>
     // Pevně zakódovaný účet pořadatele (ochrana proti podvržení účtu v URL parametrech)
     const OFFICIAL_ACCOUNT = '2303663003';
     const OFFICIAL_BANK = '2010';
+    const OFFICIAL_IBAN = 'CZ4220100000002303663003';
     const VS_PREFIX = '26';
 
     // Shodný deterministický hash s Google Apps Scriptem (FNV-1a 32-bit -> 10místný VS)
@@ -544,6 +620,49 @@
       return digits.length > 0 && digits.length <= 10 ? digits : '';
     }
 
+    function buildSpayd(amountNum, vs, safeMsg) {
+      const parts = [
+        'SPD*1.0',
+        `ACC:${OFFICIAL_IBAN}`,
+        `AM:${amountNum.toFixed(2)}`,
+        'CC:CZK'
+      ];
+      if (safeMsg) parts.push(`MSG:${safeMsg}`);
+      parts.push(`X-VS:${vs}`);
+      return parts.join('*');
+    }
+
+    function renderSpaydPngBlob(spaydText) {
+      if (typeof window.qrcode !== 'function') return Promise.resolve(null);
+      const qr = window.qrcode(0, 'M');
+      qr.addData(spaydText, 'Byte');
+      qr.make();
+
+      const count = qr.getModuleCount();
+      const quiet = 4; // Mandatory 4-module white border for reliable bank scanners
+      const totalModules = count + quiet * 2;
+      const cellSize = Math.max(8, Math.floor(640 / totalModules));
+      const size = totalModules * cellSize;
+
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, size, size);
+      ctx.fillStyle = '#000000';
+
+      for (let r = 0; r < count; r++) {
+        for (let c = 0; c < count; c++) {
+          if (qr.isDark(r, c)) {
+            ctx.fillRect((c + quiet) * cellSize, (r + quiet) * cellSize, cellSize, cellSize);
+          }
+        }
+      }
+
+      return new Promise((resolve) => canvas.toBlob((blob) => resolve(blob), 'image/png'));
+    }
+
     const params = new URLSearchParams(window.location.search);
     const amountNum = parseAmount(params.get('amount'));
     const explicitVs = sanitizeVs(params.get('vs'));
@@ -578,12 +697,82 @@
       const qrFrame = document.getElementById('qr-frame');
       const qrCaption = document.getElementById('qr-caption');
       const qrFallback = document.getElementById('qr-fallback');
-      qrImg.addEventListener('error', () => {
+      const qrActions = document.getElementById('qr-actions');
+      const shareBtn = document.getElementById('share-qr-btn');
+      const downloadBtn = document.getElementById('download-qr-btn');
+      const qrStatus = document.getElementById('qr-status');
+      let qrStatusTimer;
+
+      function setQrStatus(text, isError = false) {
+        clearTimeout(qrStatusTimer);
+        qrStatus.textContent = text;
+        if (isError) qrStatus.setAttribute('data-error', '');
+        else qrStatus.removeAttribute('data-error');
+        if (text) {
+          qrStatusTimer = setTimeout(() => { qrStatus.textContent = ''; }, 3000);
+        }
+      }
+
+      const spayd = buildSpayd(amountNum, vs, safeQrMsg);
+      const fileName = `qr-platba-${vs}.png`;
+
+      renderSpaydPngBlob(spayd).then((blob) => {
+        if (!blob) {
+          // Fallback to Paylibo image if local QR script failed
+          qrImg.addEventListener('error', () => {
+            qrFrame.hidden = true;
+            qrCaption.hidden = true;
+            qrFallback.hidden = false;
+          });
+          qrImg.src = `https://api.paylibo.com/paylibo/generator/czech/image?accountNumber=${OFFICIAL_ACCOUNT}&bankCode=${OFFICIAL_BANK}&amount=${encodeURIComponent(amountStr)}&currency=CZK&vs=${encodeURIComponent(vs)}&message=${encodeURIComponent(safeQrMsg)}&size=400`;
+          return;
+        }
+
+        const blobUrl = URL.createObjectURL(blob);
+        qrImg.src = blobUrl;
+        qrActions.hidden = false;
+
+        const qrFile = new File([blob], fileName, { type: 'image/png' });
+        const canShareFile = typeof navigator.share === 'function' &&
+          typeof navigator.canShare === 'function' &&
+          navigator.canShare({ files: [qrFile] });
+
+        function triggerDownload() {
+          const link = document.createElement('a');
+          link.href = blobUrl;
+          link.download = fileName;
+          document.body.append(link);
+          link.click();
+          link.remove();
+          setQrStatus('QR kód uložen jako obrázek.');
+        }
+
+        downloadBtn.addEventListener('click', triggerDownload);
+
+        if (canShareFile) {
+          shareBtn.hidden = false;
+          shareBtn.addEventListener('click', async () => {
+            try {
+              await navigator.share({
+                files: [qrFile],
+                title: `QR platba – Skautský ples (${amountStr} Kč)`,
+                text: `Skautský ples · ${amountStr} Kč · VS ${vs}`
+              });
+            } catch (err) {
+              if (err && err.name === 'AbortError') return;
+              triggerDownload();
+            }
+          });
+        } else {
+          // Make download button primary style when Share Sheet is unavailable (e.g. desktop)
+          downloadBtn.classList.remove('qr-btn-secondary');
+          downloadBtn.classList.add('qr-btn-primary');
+        }
+      }).catch(() => {
         qrFrame.hidden = true;
         qrCaption.hidden = true;
         qrFallback.hidden = false;
       });
-      qrImg.src = `https://api.paylibo.com/paylibo/generator/czech/image?accountNumber=${OFFICIAL_ACCOUNT}&bankCode=${OFFICIAL_BANK}&amount=${encodeURIComponent(amountStr)}&currency=CZK&vs=${encodeURIComponent(vs)}&message=${encodeURIComponent(safeQrMsg)}&size=400`;
     }
 
     // Accessible copy buttons (Invoker Commands + click fallback + legacy clipboard fallback)
