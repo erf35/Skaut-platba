@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="referrer" content="strict-origin-when-cross-origin">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23134632'/%3E%3Cpath d='M16 5l6 8h-3.5l4.5 7h-4.5l3.5 5H10l3.5-5H9l4.5-7H10l6-8z' fill='%23f0dfb8'/%3E%3C/svg%3E">
   <title>Děkujeme za registraci – Skautský ples</title>
   <style>
     :root {
@@ -119,7 +120,7 @@
     .amount-banner {
       display: flex;
       justify-content: space-between;
-      align-items: baseline;
+      align-items: center;
       gap: 12px;
       padding: 14px 18px;
       margin-bottom: 18px;
@@ -128,13 +129,27 @@
       border: 1px solid var(--moss-200);
     }
 
+    .amount-meta { display: flex; flex-direction: column; gap: 3px; text-align: left; }
+
     .amount-label {
       font-size: 0.85rem;
       font-weight: 650;
       color: var(--pine-900);
     }
 
+    .amount-sub {
+      font-size: 0.78rem;
+      color: var(--ink-500);
+    }
+
+    .amount-tickets {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--pine-800);
+    }
+
     .amount-value {
+      flex: none;
       font-size: 1.55rem;
       font-weight: 800;
       color: var(--pine-950);
@@ -468,7 +483,11 @@
 
       <div id="payment-box">
         <div class="amount-banner">
-          <span class="amount-label">Částka k úhradě</span>
+          <div class="amount-meta">
+            <span class="amount-label">Částka k úhradě</span>
+            <span id="tickets-summary" class="amount-tickets" hidden></span>
+            <span id="due-note" class="amount-sub">Prosíme o úhradu do 7 dnů</span>
+          </div>
           <span class="amount-value"><span id="amount-hero">--</span> Kč</span>
         </div>
 
@@ -663,15 +682,36 @@
       return new Promise((resolve) => canvas.toBlob((blob) => resolve(blob), 'image/png'));
     }
 
+    function formatTicketsSummary(bezRaw, sRaw) {
+      const bez = Math.max(0, Math.floor(parseAmount(bezRaw) || 0));
+      const s = Math.max(0, Math.floor(parseAmount(sRaw) || 0));
+      const parts = [];
+      if (bez > 0) parts.push(`${bez}× bez večeře`);
+      if (s > 0) parts.push(`${s}× s večeří`);
+      if (parts.length === 0) return '';
+      const total = bez + s;
+      return parts.length > 1 ? `${parts.join(', ')} (celkem ${total} ks)` : parts[0];
+    }
+
     const params = new URLSearchParams(window.location.search);
     const amountNum = parseAmount(params.get('amount'));
     const explicitVs = sanitizeVs(params.get('vs'));
     const sid = (params.get('sid') || '').trim();
     const rid = (params.get('rid') || '').trim();
     const name = (params.get('name') || '').trim();
+    const ticketsSummary = formatTicketsSummary(params.get('bez'), params.get('s'));
+    const dueDays = Math.floor(parseAmount(params.get('due')) || 0);
 
     if (name) {
       document.getElementById('greeting-text').textContent = `Ahoj ${name}, tvoje objednávka vstupenek je zapsaná. Pro její potvrzení prosím uhraď částku níže.`;
+    }
+    if (ticketsSummary) {
+      const ticketsEl = document.getElementById('tickets-summary');
+      ticketsEl.textContent = ticketsSummary;
+      ticketsEl.hidden = false;
+    }
+    if (dueDays > 0 && dueDays <= 60) {
+      document.getElementById('due-note').textContent = `Prosíme o úhradu do ${dueDays} dnů`;
     }
 
     const vs = explicitVs || (sid ? generateVS(sid) : (rid ? generateVS(rid) : ''));
