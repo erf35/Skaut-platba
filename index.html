@@ -327,10 +327,22 @@
     .footer-note {
       margin: 16px 0 0;
       text-align: center;
-      font-size: 0.8rem;
+      font-size: 0.82rem;
       color: var(--ink-500);
+      line-height: 1.6;
       text-wrap: pretty;
     }
+
+    .contact-link {
+      color: var(--forest-900);
+      font-weight: 650;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      white-space: nowrap;
+    }
+
+    .contact-link:hover { color: var(--forest-800); }
+    .contact-link:focus-visible { outline: 2px solid var(--forest-800); outline-offset: 2px; border-radius: 3px; }
 
     .sr-only {
       position: absolute;
@@ -391,7 +403,7 @@
         <div class="details">
           <div class="row">
             <div class="row-info">
-              <span class="label">Číslo účtu (Fio banka)</span>
+              <span class="label">Číslo účtu</span>
               <span id="acc-text" class="val val-mono">2303663003/2010</span>
             </div>
             <span class="copy">
@@ -452,12 +464,14 @@
 
         <ol class="steps" aria-label="Co se děje dál">
           <li><span class="step-num" aria-hidden="true">1</span><span>Platební údaje jsme ti poslali také na e-mail (zkontroluj případně i složku Hromadné / Spam).</span></li>
-          <li><span class="step-num" aria-hidden="true">2</span><span>Jakmile platba dorazí na účet Fio banky, systém ji automaticky spáruje podle variabilního symbolu.</span></li>
-          <li><span class="step-num" aria-hidden="true">3</span><span>Během několika minut po připsání ti pošleme potvrzovací e-mail o platných vstupenkách.</span></li>
+          <li><span class="step-num" aria-hidden="true">2</span><span>Po připsání platby na účet ti automaticky pošleme potvrzovací e-mail o platných vstupenkách.</span></li>
         </ol>
       </div>
 
-      <p class="footer-note">Těšíme se na tebe na Skautském plese!</p>
+      <p class="footer-note">
+        Těšíme se na tebe na Skautském plese!<br>
+        V případě dotazů nebo potíží nás kontaktuj na <a class="contact-link" href="tel:+420770181625">+420 770 181 625</a>.
+      </p>
     </div>
   </main>
 
